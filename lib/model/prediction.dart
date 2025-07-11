@@ -51,19 +51,19 @@ class Prediction {
   Prediction.fromJson(Map<String, dynamic> json) {
     description = json['description'];
     id = json['id'];
-    if (json['matched_substrings'] != null) {
+    if (json['matchedSubstrings'] != null) {
       matchedSubstrings = [];
-      json['matched_substrings'].forEach((v) {
+      json['matchedSubstrings'].forEach((v) {
         matchedSubstrings!.add(new MatchedSubstrings.fromJson(v));
       });
     }
-    placeId = json['place_id'];
+    placeId = json['placeId'];
     reference = json['reference'];
-    structuredFormatting = json['structured_formatting'] != null
-        ? new StructuredFormatting.fromJson(json['structured_formatting'])
+    structuredFormatting = json['structuredFormatting'] != null
+        ? new StructuredFormatting.fromJson(json['structuredFormatting'])
         : null;
     if (json['terms'] != null) {
-      terms =[];
+      terms = [];
       json['terms'].forEach((v) {
         terms!.add(new Terms.fromJson(v));
       });
@@ -78,13 +78,13 @@ class Prediction {
     data['description'] = this.description;
     data['id'] = this.id;
     if (this.matchedSubstrings != null) {
-      data['matched_substrings'] =
+      data['matchedSubstrings'] =
           this.matchedSubstrings!.map((v) => v.toJson()).toList();
     }
-    data['place_id'] = this.placeId;
+    data['placeId'] = this.placeId;
     data['reference'] = this.reference;
     if (this.structuredFormatting != null) {
-      data['structured_formatting'] = this.structuredFormatting!.toJson();
+      data['structuredFormatting'] = this.structuredFormatting!.toJson();
     }
     if (this.terms != null) {
       data['terms'] = this.terms!.map((v) => v.toJson()).toList();
@@ -124,15 +124,15 @@ class StructuredFormatting {
   StructuredFormatting({this.mainText, this.secondaryText});
 
   StructuredFormatting.fromJson(Map<String, dynamic> json) {
-    mainText = json['main_text'];
+    mainText = json['mainText'];
 
-    secondaryText = json['secondary_text'];
+    secondaryText = json['secondaryText'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['main_text'] = this.mainText;
-    data['secondary_text'] = this.secondaryText;
+    data['mainText'] = this.mainText;
+    data['secondaryText'] = this.secondaryText;
     return data;
   }
 }

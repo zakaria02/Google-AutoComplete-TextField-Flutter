@@ -73,6 +73,8 @@ class _MyHomePageState extends State<MyHomePage> {
       child: GooglePlaceAutoCompleteTextField(
         textEditingController: controller,
         googleAPIKey: "YOUR_GOOGLE_API_KEY",
+        baseUrl: "YOUR_BASE_URL",
+        apiKey: "YOUR_API_KEY",
         inputDecoration: InputDecoration(
           hintText: "Search your location",
           border: InputBorder.none,
