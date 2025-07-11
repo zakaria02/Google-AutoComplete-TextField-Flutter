@@ -307,7 +307,7 @@ class _GooglePlaceAutoCompleteTextFieldState
       prediction.lat = placeDetails.result!.geometry!.location!.lat.toString();
       prediction.lng = placeDetails.result!.geometry!.location!.lng.toString();
 
-      widget.getPlaceDetailWithLatLng!(prediction);
+      widget.getPlaceDetailWithLatLng!(placeDetails);
     } catch (e) {
       var errorHandler = ErrorHandler.internal().handleError(e);
       _showSnackBar("${errorHandler.message}");
@@ -359,8 +359,7 @@ PlaceDetails parsePlaceDetailMap(Map responseBody) {
 }
 
 typedef ItemClick = void Function(Prediction postalCodeResponse);
-typedef GetPlaceDetailswWithLatLng = void Function(
-    Prediction postalCodeResponse);
+typedef GetPlaceDetailswWithLatLng = void Function(PlaceDetails placeDetails);
 
 typedef ListItemBuilder = Widget Function(
     BuildContext context, int index, Prediction prediction);

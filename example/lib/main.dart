@@ -81,10 +81,9 @@ class _MyHomePageState extends State<MyHomePage> {
         debounceTime: 400,
         countries: ["in", "fr"],
         isLatLngRequired: true,
-        getPlaceDetailWithLatLng: (Prediction prediction) {
-          print("placeDetails" + prediction.lat.toString());
+        getPlaceDetailWithLatLng: (PlaceDetails placeDetails) {
+          print("placeDetails : " + placeDetails.toString());
         },
-
         itemClick: (Prediction prediction) {
           controller.text = prediction.description ?? "";
           controller.selection = TextSelection.fromPosition(
@@ -104,7 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 SizedBox(
                   width: 7,
                 ),
-                Expanded(child: Text("${prediction.description ?? ""}"))
+                EExpanded(child: Text("${prediction.description ?? ""}"))
               ],
             ),
           );
