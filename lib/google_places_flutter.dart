@@ -11,6 +11,7 @@ import 'package:rxdart/rxdart.dart';
 
 import 'DioErrorHandler.dart';
 
+// ignore: must_be_immutable
 class GooglePlaceAutoCompleteTextField extends StatefulWidget {
   InputDecoration inputDecoration;
   ItemClick? itemClick;
@@ -118,10 +119,9 @@ class _GooglePlaceAutoCompleteTextFieldState
                 focusNode: widget.focusNode ?? FocusNode(),
                 textInputAction: widget.textInputAction ?? TextInputAction.done,
                 onFieldSubmitted: (value) {
-                  if(widget.formSubmitCallback!=null){
+                  if (widget.formSubmitCallback != null) {
                     widget.formSubmitCallback!();
                   }
-
                 },
                 validator: (inputString) {
                   return widget.validator?.call(inputString, context);
@@ -147,8 +147,15 @@ class _GooglePlaceAutoCompleteTextFieldState
   }
 
   getLocation(String text) async {
-    String apiURL =
+    String url =
         "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$text&key=${widget.googleAPIKey}&language=${widget.language}";
+
+    String proxyURL = "https://corsproxy.io/?";
+    String apiURL = kIsWeb ? proxyURL + url : url;
+
+    final options = kIsWeb
+        ? Options(headers: {"x-requested-with": "XMLHttpRequest"})
+        : null;
 
     if (widget.countries != null) {
       // in
@@ -184,7 +191,7 @@ class _GooglePlaceAutoCompleteTextFieldState
       String proxyURL = "https://cors-anywhere.herokuapp.com/";
       String url = kIsWeb ? proxyURL + apiURL : apiURL;
 
-      Response response = await _dio.get(url);
+      Response response = await _dio.get(url, options: options);
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
       Map map = response.data;
@@ -265,7 +272,7 @@ class _GooglePlaceAutoCompleteTextFieldState
                             widget.itemClick!(selectedData);
 
                             if (widget.isLatLngRequired) {
-                             await getPlaceDetailsFromPlaceId(selectedData);
+                              await getPlaceDetailsFromPlaceId(selectedData);
                             }
                             removeOverlay();
                           }
@@ -282,6 +289,7 @@ class _GooglePlaceAutoCompleteTextFieldState
                 ),
               ));
     }
+    return null;
   }
 
   removeOverlay() {
@@ -295,11 +303,19 @@ class _GooglePlaceAutoCompleteTextFieldState
   Future<void> getPlaceDetailsFromPlaceId(Prediction prediction) async {
     //String key = GlobalConfiguration().getString('google_maps_key');
 
-    var url =
+    var apiURL =
         "https://maps.googleapis.com/maps/api/place/details/json?placeid=${prediction.placeId}&key=${widget.googleAPIKey}";
+
+    String proxyURL = "https://corsproxy.io/?";
+    String url = kIsWeb ? proxyURL + apiURL : apiURL;
+
+    final options = kIsWeb
+        ? Options(headers: {"x-requested-with": "XMLHttpRequest"})
+        : null;
     try {
       Response response = await _dio.get(
         url,
+        options: options,
       );
 
       PlaceDetails placeDetails = PlaceDetails.fromJson(response.data);
