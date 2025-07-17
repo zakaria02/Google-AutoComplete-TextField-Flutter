@@ -11,6 +11,29 @@ import 'package:rxdart/rxdart.dart';
 
 import 'DioErrorHandler.dart';
 
+// Controller class to expose methods
+class GooglePlaceAutoCompleteController {
+  _GooglePlaceAutoCompleteTextFieldState? _state;
+
+  void _attach(_GooglePlaceAutoCompleteTextFieldState state) {
+    _state = state;
+  }
+
+  void _detach() {
+    _state = null;
+  }
+
+  /// Removes the overlay with predictions
+  void removeOverlay() {
+    _state?.removeOverlay();
+  }
+
+  /// Clears all data including text and overlay
+  void clearData() {
+    _state?.clearData();
+  }
+}
+
 // ignore: must_be_immutable
 class GooglePlaceAutoCompleteTextField extends StatefulWidget {
   InputDecoration inputDecoration;
@@ -47,6 +70,9 @@ class GooglePlaceAutoCompleteTextField extends StatefulWidget {
   final String apiKey;
   final String baseUrl;
 
+  // Add controller parameter
+  final GooglePlaceAutoCompleteController? controller;
+
   GooglePlaceAutoCompleteTextField(
       {required this.textEditingController,
       required this.googleAPIKey,
@@ -75,7 +101,8 @@ class GooglePlaceAutoCompleteTextField extends StatefulWidget {
       this.radius,
       this.formSubmitCallback,
       this.textInputAction,
-      this.clearData});
+      this.clearData,
+      this.controller}); // Add controller to constructor
 
   @override
   _GooglePlaceAutoCompleteTextFieldState createState() =>
@@ -96,6 +123,26 @@ class _GooglePlaceAutoCompleteTextFieldState
   late var _dio;
 
   CancelToken? _cancelToken = CancelToken();
+
+  @override
+  void initState() {
+    super.initState();
+    _dio = Dio();
+    subject.stream
+        .distinct()
+        .debounceTime(Duration(milliseconds: widget.debounceTime))
+        .listen(textChanged);
+
+    // Attach controller if provided
+    widget.controller?._attach(this);
+  }
+
+  @override
+  void dispose() {
+    // Detach controller
+    widget.controller?._detach();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -219,16 +266,6 @@ class _GooglePlaceAutoCompleteTextFieldState
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _dio = Dio();
-    subject.stream
-        .distinct()
-        .debounceTime(Duration(milliseconds: widget.debounceTime))
-        .listen(textChanged);
-  }
-
   textChanged(String text) async {
     if (text.isNotEmpty) {
       getLocation(text);
@@ -287,12 +324,14 @@ class _GooglePlaceAutoCompleteTextFieldState
     return null;
   }
 
-  removeOverlay() {
+  void removeOverlay() {
     alPredictions.clear();
-    this._overlayEntry = this._createOverlayEntry();
-
-    Overlay.of(context).insert(this._overlayEntry!);
-    this._overlayEntry!.markNeedsBuild();
+    if (this._overlayEntry != null) {
+      try {
+        this._overlayEntry?.remove();
+        this._overlayEntry = null;
+      } catch (e) {}
+    }
   }
 
   Future<void> getPlaceDetailsFromPlaceId(Prediction prediction) async {
@@ -333,6 +372,7 @@ class _GooglePlaceAutoCompleteTextFieldState
     if (this._overlayEntry != null) {
       try {
         this._overlayEntry?.remove();
+        this._overlayEntry = null;
       } catch (e) {}
     }
   }
